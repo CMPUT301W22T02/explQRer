@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:src="@drawable/sharp_add_black_36"
+        android:layout_marginLeft="40dp"
+        >
+
+    </ImageView>
+    <TextView
+        android:id="@+id/rank_in_leaderboard"
+        android:layout_width="110dp"
+        android:layout_height="60dp"
+        android:textAlignment="center"
+        android:gravity="center">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/name_in_leaderboard"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:textAlignment="center"
+        android:gravity="center">
+
+    </TextView>
+
+
+
+</LinearLayout>
