@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
@@ -18,6 +19,7 @@ import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
@@ -27,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,7 +49,13 @@ import java.util.ArrayList;
 
 public class GeolocationMapShow extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private FusedLocationProviderClient client;
+    private final int REQUESTING_LOCATION_UPDATES_KEY = 2;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+
+
     private LocationManager locationManager;
     private LocationListener locationListener;
     private TextView getLongitude, getLatitude;
@@ -53,11 +63,13 @@ public class GeolocationMapShow extends AppCompatActivity {
     private MapController mapController;
     private double latitude, longitude;
     Button button;
+    Boolean requestingLocationUpdates;
+    Location myCurrentLocation;
 
     boolean gps_status = false;
 
 
-    @RequiresApi(api = Build.VERSION_CODES.P)
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +131,7 @@ public class GeolocationMapShow extends AppCompatActivity {
 
             }
         });*/
+
         // Request permission
         requestPermissionsIfNecessary(new String[]{
                 // if you need to show the current location, uncomment the line below
@@ -132,50 +145,45 @@ public class GeolocationMapShow extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 
-        Log.d("TAG", "onCreate: longitude = " + longitude);
-        Log.d("TAG", "onCreate: latitude = " + latitude);
+        // option 2: Change location setting
+        locationRequest = LocationRequest.create();
 
-
-
-        /*if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            getLastLocation();
-        } else {
-            askLocationPermission();
-        }*/
-
-
-        // Get current location option 2 ( getfused) ---- failed
-        client = LocationServices.getFusedLocationProviderClient(GeolocationMapShow.this);
-        Task<Location> locationTask = client.getLastLocation();
+        // Get current location option 2 ( defused) ---- failed
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(GeolocationMapShow.this);
+        Task<Location> locationTask = fusedLocationProviderClient.getLastLocation();
         locationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
+                    myCurrentLocation = location;
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
                 }
 
             }
         });
-
-        locationTask.addOnFailureListener(new OnFailureListener() {
+        // option 2 continue: updateLocation()
+        locationCallback = new LocationCallback() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                // run time exception
-                Log.e("TAG", "onFailure: " + e.getLocalizedMessage());
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                }
             }
-        });
+        };
+        updateValuesFromBundle(savedInstanceState);
 
-        Log.d("TAG", "onCreate: longitude = " + longitude);
-        Log.d("TAG", "onCreate: latitude = " + latitude);
+
 
 
         // find option 3
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        /*if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             getLocation();
-        }
-        Log.d("TAG", "onCreate: longitude = " + longitude);
-        Log.d("TAG", "onCreate: latitude = " + latitude);
+        }*/
 
 
         // zoom button
@@ -196,7 +204,7 @@ public class GeolocationMapShow extends AppCompatActivity {
 
         // Default map zoom level:
         mapController = (MapController) mapView.getController();
-        mapController.setZoom(5);
+        mapController.setZoom(10);
 
         // Set center
         GeoPoint center = new GeoPoint(latitude, longitude);
@@ -227,6 +235,15 @@ public class GeolocationMapShow extends AppCompatActivity {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
         mapView.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+        if (requestingLocationUpdates) { // option 2
+            startLocationUpdates();
+        }
+    }
+
+    private void startLocationUpdates() { // option 2
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
     }
 
     @Override
@@ -237,21 +254,42 @@ public class GeolocationMapShow extends AppCompatActivity {
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
         mapView.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+        stopLocationUpdates(); // option2
+    }
+
+    private void stopLocationUpdates() { // option 2
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
+                requestingLocationUpdates);
+        // ...
+        super.onSaveInstanceState(outState);
+    }
+
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        // Update the value of requestingLocationUpdates from the Bundle.
+        if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+            requestingLocationUpdates = savedInstanceState.getBoolean(REQUESTING_LOCATION_UPDATES_KEY);
+        }
+
+        // ...
+
+        // Update UI to match restored state
+        updateUI();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        /*ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (int i = 0; i < grantResults.length; i++) {
-            permissionsToRequest.add(permissions[i]);
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }*/
+
         if (requestCode== REQUEST_PERMISSIONS_REQUEST_CODE &&grantResults.length>0){
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 return;
@@ -273,12 +311,13 @@ public class GeolocationMapShow extends AppCompatActivity {
         // more than one permission is not granted
         if (permissionsToRequest.size() > 0) {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[0]),REQUEST_PERMISSIONS_REQUEST_CODE);
+            requestingLocationUpdates = true; // set update to be true
         } else { // all are granted
-
             return;
         }
     }
 
+    // option 3
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(
                 GeolocationMapShow.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -296,66 +335,8 @@ public class GeolocationMapShow extends AppCompatActivity {
         }
     }
 
-
-
-
     // option 2
-    /*public void getLastLocation() {
-        client = LocationServices.getFusedLocationProviderClient(GeolocationMapShow.this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Task<Location> locationTask = client.getLastLocation();
-        locationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null){
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                }
-
-            }
-        });
-
-        locationTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // run time exception
-                Log.e("TAG", "onFailure: " + e.getLocalizedMessage());
-            }
-        });
+    public void updateLocation(){
 
     }
-
-    public void askLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(GeolocationMapShow.this,Manifest.permission.ACCESS_FINE_LOCATION)){
-                ActivityCompat.requestPermissions(GeolocationMapShow.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}
-                ,REQUEST_PERMISSIONS_REQUEST_CODE);
-            }else{
-                ActivityCompat.requestPermissions(GeolocationMapShow.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}
-                        , REQUEST_PERMISSIONS_REQUEST_CODE);
-            }
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //permission granted
-                getLastLocation();
-            } else {
-                // permission not granted
-            }
-        }
-    }*/
 }

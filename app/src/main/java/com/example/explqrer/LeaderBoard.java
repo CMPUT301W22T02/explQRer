@@ -21,10 +21,6 @@ public class LeaderBoard {
     private HashMap<Player, Integer> sortedMap;
     private Player topPlayer;
 
-    // need to change the type if discuss the type of input
-    // and what is the format of the data we want to store
-    // how many table
-    // one for each rank or three different
     public LeaderBoard(HashMap<Player, Integer> gameData) {
         this.unsortedMap = gameData;
     }
@@ -33,7 +29,7 @@ public class LeaderBoard {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public HashMap<Player, Integer> sort(HashMap<Player, Integer> unsortedMap) {
         // this return a sorted arraylist only contains
-        // 6 player info with the hignest grade
+        // 6 player info with the highest grade
 
         // create a list from elements of unsortedMap
         List<Map.Entry<Player, Integer>> list = new LinkedList<Map.Entry<Player, Integer>>(unsortedMap.entrySet());
