@@ -2,16 +2,21 @@ package com.example.explqrer;
 
 
 import static com.example.explqrer.R.id.image;
+import static com.example.explqrer.R.id.image_gallery;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -92,8 +97,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         private ImageView image;
         public ViewHolder(View view) {
             super(view);
-
             image = view.findViewById(R.id.image);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(context,"clicked="+ getBindingAdapterPosition(),Toast.LENGTH_SHORT).show();
+                    ImageView enlarged_image =  view.findViewById(R.id.expanded_image);
+
+//                    enlarged_image.setVisibility(View.VISIBLE);
+                    System.out.println(galleryList.get(getBindingAdapterPosition()).getImage());
+                    enlarged_image.setImageBitmap(galleryList.get(getBindingAdapterPosition()).getImage());
+                }
+            });
         }
     }
 

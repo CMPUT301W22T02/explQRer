@@ -13,13 +13,14 @@
         android:layout_marginStart="7dp"
         android:layout_marginTop="52dp"
         android:background="#0F9D58"
+        android:contentDescription="settings"
         android:src="@android:drawable/ic_menu_help"
         android:textColor="#ffffff"
-        android:contentDescription="settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.157"
         app:layout_constraintStart_toEndOf="@+id/points"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/points"
@@ -50,6 +51,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_navigation_profile_page"
         />
+
+
+    <ImageView
+        android:id="@+id/expanded_image"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="16dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/image_gallery"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="49dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

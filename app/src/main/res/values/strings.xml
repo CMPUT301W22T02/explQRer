@@ -24,4 +24,6 @@
     <string name="view_profile">View Profile</string>
     <string name="scan_for_points">Scan for Points</string>
     <string name="player_qr_alert_description_text">This is a player code. You can scan it for points, see the user\'s profile, or log in to this account.</string>
+    <string name="description">Description:</string>
+
 </resources>
