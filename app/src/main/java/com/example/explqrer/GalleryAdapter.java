@@ -5,6 +5,7 @@ import static com.example.explqrer.R.id.image;
 import static com.example.explqrer.R.id.image_gallery;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -101,13 +102,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
                     //Toast.makeText(context,"clicked="+ getBindingAdapterPosition(),Toast.LENGTH_SHORT).show();
-                    ImageView enlarged_image =  view.findViewById(R.id.expanded_image);
-
-//                    enlarged_image.setVisibility(View.VISIBLE);
                     System.out.println(galleryList.get(getBindingAdapterPosition()).getImage());
-                    enlarged_image.setImageBitmap(galleryList.get(getBindingAdapterPosition()).getImage());
+                    Bitmap image_to_enlargen = galleryList.get(getBindingAdapterPosition()).getImage();
+//                    enlargedImage.setImageBitmap(galleryList.get(getBindingAdapterPosition()).getImage());
+                    Intent intent = new Intent(context, UserProfileActivity.class);
+                    intent.putExtra("enlarged_image", image_to_enlargen);
+
                 }
             });
         }

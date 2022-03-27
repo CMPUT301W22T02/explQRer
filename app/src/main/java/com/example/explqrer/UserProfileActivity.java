@@ -8,12 +8,14 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
     private static final String[] paths = {"Select to delete QR", "Scan to sign-in", "Edit Profile"};
     private BottomNavigationView bottomNavigationView;
     private PlayerProfile player;
+    private ImageView enlargedImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -53,6 +56,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         // Referencing and Initializing the button
         ImageButton button = (ImageButton) findViewById(R.id.settings);
 
+        enlargedImageView = findViewById(R.id.expanded_image);
         bottomNavigationView = findViewById(R.id.bottom_navigation_profile);
         bottomNavigationView.setOnItemSelectedListener((NavigationBarView.OnItemSelectedListener) this);
 
@@ -93,6 +97,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         this.populateBanner(player.getName()); //calls populateBanner to put points and scans in in banner recycler view
         this.populateGallery(player); //calls populateGallery to put images in the gallery recycler view and provides name of player as parameter
+        this.enlargeImage();
     }
 
 
@@ -211,5 +216,21 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages);
         System.out.println("before adapter");
         galleryRecyclerView.setAdapter(galleryListAdapter);
+    }
+
+    private void enlargeImage(){
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null){
+            int largeImage = bundle.getInt("enlarged_image");
+            System.out.println("this is the large image: "+ largeImage);
+            enlargedImageView.setVisibility(View.VISIBLE);
+            enlargedImageView.setImageResource(largeImage);
+            return;
+
+        }else{
+            return;
+        }
+
     }
 }
