@@ -35,7 +35,7 @@ public class GameCodeFragment extends DialogFragment {
 
     public static GameCodeFragment newInstance(String hash) {
         Bundle args = new Bundle();
-
+        args.putString("Hash",hash);
         GameCodeFragment fragment = new GameCodeFragment();
         fragment.setArguments(args);
         return fragment;

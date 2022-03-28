@@ -2,6 +2,8 @@ package com.example.explqrer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
@@ -97,7 +99,6 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         this.populateBanner(player.getName()); //calls populateBanner to put points and scans in in banner recycler view
         this.populateGallery(player); //calls populateGallery to put images in the gallery recycler view and provides name of player as parameter
-        this.enlargeImage();
     }
 
 
@@ -218,19 +219,14 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         galleryRecyclerView.setAdapter(galleryListAdapter);
     }
 
-    private void enlargeImage(){
-        Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null){
-            int largeImage = bundle.getInt("enlarged_image");
-            System.out.println("this is the large image: "+ largeImage);
-            enlargedImageView.setVisibility(View.VISIBLE);
-            enlargedImageView.setImageResource(largeImage);
-            return;
-
-        }else{
-            return;
-        }
+    public void generateFragment(String codeHash) {
+        GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
+        FragmentManager fragmentManager =  getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =   fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.gamecode_fragment, new GameCodeFragment(), "tag");
+        fragmentTransaction.addToBackStack("tag");
+        fragmentTransaction.commit();
+        gameCodeFragment.show(getSupportFragmentManager(),"GAMECODE");
 
     }
 }

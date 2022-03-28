@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -99,17 +100,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         public ViewHolder(View view) {
             super(view);
             image = view.findViewById(R.id.image);
-
+            UserProfileActivity userProfileActivity = new UserProfileActivity();
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //Toast.makeText(context,"clicked="+ getBindingAdapterPosition(),Toast.LENGTH_SHORT).show();
-                    System.out.println(galleryList.get(getBindingAdapterPosition()).getImage());
-                    Bitmap image_to_enlargen = galleryList.get(getBindingAdapterPosition()).getImage();
-//                    enlargedImage.setImageBitmap(galleryList.get(getBindingAdapterPosition()).getImage());
-                    Intent intent = new Intent(context, UserProfileActivity.class);
-                    intent.putExtra("enlarged_image", image_to_enlargen);
-
+                    System.out.println(galleryList.get(getBindingAdapterPosition()).getHashCode());
+                    String codeHash = galleryList.get(getBindingAdapterPosition()).getHashCode();
+                    userProfileActivity.generateFragment(codeHash);
+//                    GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
+//                    gameCodeFragment.show(((AppCompatActivity) context).getSupportFragmentManager(),"GAMECODE");
                 }
             });
         }

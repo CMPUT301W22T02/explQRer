@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 public class GalleryListItem {
 
     private Bitmap image;
+    private String hashCode;
 
     /**
      * This gets the ID of the image stored in the ImageListItem object
@@ -28,5 +29,13 @@ public class GalleryListItem {
      */
     public void setImageId(Bitmap bitmapImage){
         this.image = bitmapImage;
+    }
+
+    public String getHashCode(){
+       return this.hashCode;
+    }
+
+    public void setHashCode(String hashCode){
+        this.hashCode = hashCode;
     }
 }

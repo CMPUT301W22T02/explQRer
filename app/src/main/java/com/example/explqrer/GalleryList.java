@@ -30,6 +30,9 @@ public class GalleryList extends AppCompatActivity {
         //loop through the QRs scanned by the player
         for(GameCode qr : qrCodesSet ){
             GalleryListItem galleryListItem = new GalleryListItem();
+
+            //get the hash of the qr and set it to the galleryListItem
+            galleryListItem.setHashCode(qr.getSha256hex());
             //get image of the qr scanned and set the images
             galleryListItem.setImageId(qr.getPhoto());
             listOfImages.add(galleryListItem);
