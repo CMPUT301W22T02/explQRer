@@ -19,6 +19,13 @@ import java.util.Set;
  */
 public class GalleryList extends AppCompatActivity {
 
+    /**
+     * update the gallery list
+     * @param player
+     *     takes in a player object
+     * @return listOfImages
+     *     list of bitmaps that corrospond to th QR codes scanned
+     */
     public static ArrayList<GalleryListItem> updateGallery(PlayerProfile player){
 
         HashMap<GameCode,GameCode> qrCodes = player.getCodes();
