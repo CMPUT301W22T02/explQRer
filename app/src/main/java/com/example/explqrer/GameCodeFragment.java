@@ -41,6 +41,18 @@ public class GameCodeFragment extends DialogFragment {
         return fragment;
     }
 
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+//        if (context instanceof GameCodeFragment.IsPlayerQrFragmentListener) {
+//            listener = (IsPlayerQrFragment.IsPlayerQrFragmentListener) context;
+//        } else {
+//            throw new RuntimeException(context
+//                    + " must implement IsPlayerQrFragmentListener");
+//        }
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -58,12 +70,7 @@ public class GameCodeFragment extends DialogFragment {
 //        } else {
 //
 //        }
-
-
-
-
-
-
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder.setView(view)
                 .setPositiveButton("Hello", null)

@@ -104,12 +104,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //Toast.makeText(context,"clicked="+ getBindingAdapterPosition(),Toast.LENGTH_SHORT).show();
-                    System.out.println(galleryList.get(getBindingAdapterPosition()).getHashCode());
                     String codeHash = galleryList.get(getBindingAdapterPosition()).getHashCode();
                     userProfileActivity.generateFragment(codeHash);
-//                    GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
-//                    gameCodeFragment.show(((AppCompatActivity) context).getSupportFragmentManager(),"GAMECODE");
                 }
             });
         }

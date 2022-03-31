@@ -81,11 +81,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                                 Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
                                 startActivity(intent);
                                 break;
-                            case R.id.scan_sign_in:
-                                // Scan to sign in
-                                Intent myIntent = new Intent(getApplicationContext(), ProfileQr.class);
-                                startActivity(myIntent);
-                              break;
+
                             default:
                                 break;
                         }
@@ -122,9 +118,8 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
                 return true;
 
-            case R.id.scan_nav:
-                Intent scanningIntent= new Intent(this, ScanningPageActivity.class);
-                startActivity(scanningIntent);
+            case R.id.home_nav:
+                finish();
                 return true;
 
             case R.id.search_nav:
@@ -221,6 +216,8 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
     public void generateFragment(String codeHash) {
         GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
+
+        gameCodeFragment.onAttach(getApplicationContext());
         FragmentManager fragmentManager =  getSupportFragmentManager();
         FragmentTransaction fragmentTransaction =   fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.gamecode_fragment, new GameCodeFragment(), "tag");
