@@ -1,25 +1,20 @@
 package com.example.explqrer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -63,38 +58,32 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         bottomNavigationView.setOnItemSelectedListener((NavigationBarView.OnItemSelectedListener) this);
 
         // Setting onClick behavior to the button
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Initializing the popup menu and giving the reference as current context
-                PopupMenu popupMenu = new PopupMenu(UserProfileActivity.this, button);
+        button.setOnClickListener(view -> {
+            // Initializing the popup menu and giving the reference as current context
+            PopupMenu popupMenu = new PopupMenu(UserProfileActivity.this, button);
 
-                // Inflating popup menu from popup_menu.xml file
-                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        int id = item.getItemId();
-                        switch(id) {
-                            case R.id.edit_profile:
-                                // Edit profile
-                                Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
-                                startActivity(intent);
-                                break;
-                            case R.id.scan_sign_in:
-                                // Scan to sign in
-                                Intent myIntent = new Intent(getApplicationContext(), ProfileQr.class);
-                                startActivity(myIntent);
-                              break;
-                            default:
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                // Showing the popup menu
-                popupMenu.show();
-            }
+            // Inflating popup menu from popup_menu.xml file
+            popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch(id) {
+                    case R.id.edit_profile:
+                        // Edit profile
+                        Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.scan_sign_in:
+                        // Scan to sign in
+                        Intent myIntent = new Intent(getApplicationContext(), ProfileQr.class);
+                        startActivity(myIntent);
+                      break;
+                    default:
+                        break;
+                }
+                return false;
+            });
+            // Showing the popup menu
+            popupMenu.show();
         });
 
         this.populateBanner(player.getName()); //calls populateBanner to put points and scans in in banner recycler view
@@ -123,8 +112,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                 return true;
 
             case R.id.scan_nav:
-                Intent scanningIntent= new Intent(this, ScanningPageActivity.class);
-                startActivity(scanningIntent);
+                Toast.makeText(this, "Not available", Toast.LENGTH_SHORT).show();
                 return true;
 
             case R.id.search_nav:
@@ -214,19 +202,12 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         ArrayList<GalleryListItem> listOfImages = GalleryList.updateGallery(player);
 
-        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages);
-        System.out.println("before adapter");
+        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(), listOfImages, this);
         galleryRecyclerView.setAdapter(galleryListAdapter);
     }
 
     public void generateFragment(String codeHash) {
         GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
-        FragmentManager fragmentManager =  getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =   fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.gamecode_fragment, new GameCodeFragment(), "tag");
-        fragmentTransaction.addToBackStack("tag");
-        fragmentTransaction.commit();
-        gameCodeFragment.show(getSupportFragmentManager(),"GAMECODE");
-
+        gameCodeFragment.show(getSupportFragmentManager(), "GAME_CODE");
     }
 }

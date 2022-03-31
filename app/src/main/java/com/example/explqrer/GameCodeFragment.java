@@ -1,9 +1,7 @@
 package com.example.explqrer;
 
-import android.app.AlertDialog;
+
 import android.app.Dialog;
-import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +9,7 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 public class GameCodeFragment extends DialogFragment {
@@ -36,6 +35,7 @@ public class GameCodeFragment extends DialogFragment {
     public static GameCodeFragment newInstance(String hash) {
         Bundle args = new Bundle();
         args.putString("Hash",hash);
+
         GameCodeFragment fragment = new GameCodeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -46,6 +46,7 @@ public class GameCodeFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity())
                 .inflate(R.layout.fragment_gamecode, null);
+        String hash = getArguments().getString("Hash");
 //        deleteButton = view.findViewById(R.id.whatever);
 
 //        if (getActivity() instanceof MapActivity) {
@@ -60,13 +61,9 @@ public class GameCodeFragment extends DialogFragment {
 //        }
 
 
-
-
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         return builder.setView(view)
-                .setPositiveButton("Hello", null)
+                .setPositiveButton(hash, null)
                 .create();
     }
 }

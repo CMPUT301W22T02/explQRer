@@ -307,7 +307,7 @@ public class MapActivity extends AppCompatActivity implements OnGetNearByQrsList
 
 
         for (GameCode.CodeLocation location : locations) {
-            Point point = Point.fromLngLat(location.location.getLongitude(), location.location.getLatitude());
+            Point point = Point.fromLngLat(location.getLocation().getLongitude(), location.getLocation().getLatitude());
 
             PointAnnotationOptions pointAnnotationOptions = new PointAnnotationOptions()
                     .withPoint(point)
@@ -322,11 +322,11 @@ public class MapActivity extends AppCompatActivity implements OnGetNearByQrsList
                     .build();
 
             TextView pts = (TextView) annotationManager.addViewAnnotation(R.layout.map_qr, viewAnnotationOptions);
-            pts.setText(GameCode.calculateScore(location.hash) + " pts");
+            pts.setText(GameCode.calculateScore(location.getHash()) + " pts");
             pts.setOnClickListener(view -> {
                 Log.d("TAG", "WORKING!");
 
-                GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(location);
+                GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(location.getHash());
                 gameCodeFragment.show(getSupportFragmentManager(), "GAME_CODE");
                 //TODO: popup for the clicked QR
             });
