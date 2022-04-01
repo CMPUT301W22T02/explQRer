@@ -41,7 +41,9 @@ public class GalleryList extends AppCompatActivity {
             //get the hash of the qr and set it to the galleryListItem
             galleryListItem.setHashCode(qr.getSha256hex());
             //get image of the qr scanned and set the images
-            galleryListItem.setImageId(qr.getPhoto());
+            galleryListItem.setImage(qr.getPhoto());
+            galleryListItem.setCodePts(qr.getScore());
+            galleryListItem.setCodeDescription(qr.getDescription());
             listOfImages.add(galleryListItem);
         }
         System.out.println("before listof images");

@@ -58,7 +58,6 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         // Referencing and Initializing the button
         ImageButton button = (ImageButton) findViewById(R.id.settings);
 
-        enlargedImageView = findViewById(R.id.expanded_image);
         bottomNavigationView = findViewById(R.id.bottom_navigation_profile);
         bottomNavigationView.setOnItemSelectedListener((NavigationBarView.OnItemSelectedListener) this);
 
@@ -81,11 +80,6 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                                 Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
                                 startActivity(intent);
                                 break;
-                            case R.id.scan_sign_in:
-                                // Scan to sign in
-                                Intent myIntent = new Intent(getApplicationContext(), ProfileQr.class);
-                                startActivity(myIntent);
-                              break;
                             default:
                                 break;
                         }
@@ -214,19 +208,13 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         ArrayList<GalleryListItem> listOfImages = GalleryList.updateGallery(player);
 
-        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages);
+        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages,this);
         System.out.println("before adapter");
         galleryRecyclerView.setAdapter(galleryListAdapter);
     }
 
-    public void generateFragment(String codeHash) {
-        GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
-        FragmentManager fragmentManager =  getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction =   fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.gamecode_fragment, new GameCodeFragment(), "tag");
-        fragmentTransaction.addToBackStack("tag");
-        fragmentTransaction.commit();
+    public void generateFragment(String codeHash, Bitmap codeImage, int codePts, String codeDescription) {
+        GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash,codeImage,codePts,codeDescription);
         gameCodeFragment.show(getSupportFragmentManager(),"GAMECODE");
-
     }
 }

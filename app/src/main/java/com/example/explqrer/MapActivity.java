@@ -68,6 +68,7 @@ public class MapActivity extends AppCompatActivity implements OnGetNearByQrsList
     private LocationRequest locationRequest;
     private double playerLongitude, playerLatitude;
     private Bitmap image;
+    private Bitmap defaultImage = BitmapFactory.decodeResource(getResources(),R.drawable.default_qr_pin);
 
     private GesturesPluginImpl gesturePlugin;
     private LocationComponentPluginImpl locationComponentPlugin;
@@ -145,7 +146,7 @@ public class MapActivity extends AppCompatActivity implements OnGetNearByQrsList
                         new AnnotationConfig());
         // Pin icon by Icons8 https://icons8.com/icon/qYund0sKw42x/pin" https://icons8.com"
 
-        image = BitmapFactory.decodeResource(getResources(), R.drawable.red_marker);
+        image = BitmapFactory.decodeResource(getResources(), R.drawable.qr_map_pin);
 
 
         locationRequest = LocationRequest.create();
@@ -326,7 +327,7 @@ public class MapActivity extends AppCompatActivity implements OnGetNearByQrsList
             pts.setOnClickListener(view -> {
                 Log.d("TAG", "WORKING!");
 
-                GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(location.getHash());
+                GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(location.getHash(),defaultImage,1,"");
                 gameCodeFragment.show(getSupportFragmentManager(), "GAME_CODE");
                 //TODO: popup for the clicked QR
             });

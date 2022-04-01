@@ -39,6 +39,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     private ArrayList<GalleryListItem> galleryList;
     private Context context;
+    private UserProfileActivity activity;
 
     /**
      * Constructor for the class
@@ -47,10 +48,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
      * @param galleryList
      *  galleryList is the array list for the adapter
      */
-    public GalleryAdapter(Context context, ArrayList<GalleryListItem> galleryList) {
+    public GalleryAdapter(Context context, ArrayList<GalleryListItem> galleryList,UserProfileActivity activity) {
         this.galleryList = galleryList;
         this.context = context;
-        System.out.println("in adapter");
+        this.activity = activity;
     }
 
     /**
@@ -100,19 +101,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         public ViewHolder(View view) {
             super(view);
             image = view.findViewById(R.id.image);
-            UserProfileActivity userProfileActivity = new UserProfileActivity();
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //Toast.makeText(context,"clicked="+ getBindingAdapterPosition(),Toast.LENGTH_SHORT).show();
-                    System.out.println(galleryList.get(getBindingAdapterPosition()).getHashCode());
+            view.setOnClickListener(view1 -> {
                     String codeHash = galleryList.get(getBindingAdapterPosition()).getHashCode();
-                    userProfileActivity.generateFragment(codeHash);
-//                    GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash);
-//                    gameCodeFragment.show(((AppCompatActivity) context).getSupportFragmentManager(),"GAMECODE");
-                }
+                    Bitmap codeImage = galleryList.get(getBindingAdapterPosition()).getImage();
+                    String codeDescription = galleryList.get(getBindingAdapterPosition()).getCodeDescription();
+                    int codePts = galleryList.get(getBindingAdapterPosition()).getCodePts();
+                    activity.generateFragment(codeHash,codeImage,codePts,codeDescription);
             });
         }
     }
-
 }

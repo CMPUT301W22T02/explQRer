@@ -12,6 +12,8 @@ public class GalleryListItem {
 
     private Bitmap image;
     private String hashCode;
+    private String codeDescription;
+    private int codePts;
 
     /**
      * This gets the ID of the image stored in the ImageListItem object
@@ -27,7 +29,7 @@ public class GalleryListItem {
      * @param bitmapImage
      *      Which is the URL of an image
      */
-    public void setImageId(Bitmap bitmapImage){
+    public void setImage(Bitmap bitmapImage){
         this.image = bitmapImage;
     }
 
@@ -38,4 +40,22 @@ public class GalleryListItem {
     public void setHashCode(String hashCode){
         this.hashCode = hashCode;
     }
+
+    public String getCodeDescription() {
+        return codeDescription;
+    }
+
+    public void setCodeDescription(String codeDescription) {
+        this.codeDescription = codeDescription;
+    }
+
+    public int getCodePts() {
+        return codePts;
+    }
+
+    public void setCodePts(int codePts) {
+        this.codePts = codePts;
+    }
+
+
 }
