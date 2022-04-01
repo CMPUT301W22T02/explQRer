@@ -27,6 +27,4 @@
     <string name="player_qr_alert_description_text">This is a player code. You can scan it for points, see the user\'s profile, or log in to this account.</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="pin">pin</string>
-    <string name="description">Description:</string>
-
 </resources>

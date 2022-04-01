@@ -2,22 +2,18 @@ package com.example.explqrer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -36,9 +32,10 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
     private static final String[] paths = {"Select to delete QR", "Scan to sign-in", "Edit Profile"};
     private BottomNavigationView bottomNavigationView;
     private PlayerProfile player;
+    private Button button;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         /* Site: stackoverflow.com
          * Link: https://stackoverflow.com/questions/28460300
          * Author: https://stackoverflow.com/users/3681880/suragch
@@ -50,6 +47,15 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
          */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
+        //button for comments
+        button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openComment();
+            }
+        });
 
         // get the player from main activity
         player = MainActivity.getPlayer();
@@ -79,6 +85,11 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                                 Intent intent = new Intent(getApplicationContext(), EditProfileActivity.class);
                                 startActivity(intent);
                                 break;
+                            case R.id.scan_sign_in:
+                                // Scan to sign in
+                                Intent myIntent = new Intent(getApplicationContext(), ProfileQr.class);
+                                startActivity(myIntent);
+                                break;
                             default:
                                 break;
                         }
@@ -92,6 +103,11 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         this.populateBanner(player.getName()); //calls populateBanner to put points and scans in in banner recycler view
         this.populateGallery(player); //calls populateGallery to put images in the gallery recycler view and provides name of player as parameter
+    }
+
+    public void openComment(){
+        Intent intent = new Intent(this, Comment.class);
+        startActivity(intent);
     }
 
 
@@ -207,13 +223,8 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         ArrayList<GalleryListItem> listOfImages = GalleryList.updateGallery(player);
 
-        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages,this);
+        GalleryAdapter galleryListAdapter = new GalleryAdapter(getApplicationContext(),listOfImages);
         System.out.println("before adapter");
         galleryRecyclerView.setAdapter(galleryListAdapter);
-    }
-
-    public void generateFragment(String codeHash, Bitmap codeImage, int codePts, String codeDescription) {
-        GameCodeFragment gameCodeFragment = GameCodeFragment.newInstance(codeHash,codeImage,codePts,codeDescription);
-        gameCodeFragment.show(getSupportFragmentManager(),"GAMECODE");
     }
 }

@@ -166,20 +166,12 @@ public class GameCode implements Serializable {
     }
 
     public static class CodeLocation {
-        private final String hash;
-        private final Location location;
+        public String hash;
+        public Location location;
 
         public CodeLocation(String hash, Location location) {
             this.hash = hash;
             this.location = location;
-        }
-
-        public String getHash() {
-            return hash;
-        }
-
-        public Location getLocation() {
-            return location;
         }
     }
 }
