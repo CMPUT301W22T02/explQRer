@@ -16,11 +16,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * class to generate a GameCode fragment, fragment to display the hash's description, pts, image wherever needed
+ */
 public class GameCodeFragment extends DialogFragment {
+
     private static final String HASH = "Hash";
     private static final String LOCATION = "Location";
     private Bitmap codeImage;
-
     private Button deleteButton;
 
     public interface deleteCodeListener {
@@ -68,9 +71,8 @@ public class GameCodeFragment extends DialogFragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Bitmap scaledImage = Bitmap.createScaledBitmap(codeImage, fragmentImageView.getWidth(), fragmentImageView.getHeight(), true);
+                Bitmap scaledImage = Bitmap.createScaledBitmap(codeImage, fragmentImageView.getWidth(), fragmentImageView.getHeight(), false);
                 fragmentImageView.setImageBitmap(scaledImage);
-                System.out.println(completeDescription);
                 fragmentDescriptionView.setText(completeDescription);
             }
         }, 500);
