@@ -36,7 +36,6 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
     private static final String[] paths = {"Select to delete QR", "Scan to sign-in", "Edit Profile"};
     private BottomNavigationView bottomNavigationView;
     private PlayerProfile player;
-    private ImageView enlargedImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){

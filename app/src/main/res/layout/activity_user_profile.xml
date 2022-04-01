@@ -12,14 +12,14 @@
         android:layout_height="30dp"
         android:layout_marginStart="7dp"
         android:layout_marginTop="52dp"
-        android:background="#0F9D58"
+        android:background="@color/cool_dark"
         android:contentDescription="settings"
-        android:src="@android:drawable/ic_menu_help"
         android:textColor="#ffffff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.157"
         app:layout_constraintStart_toEndOf="@+id/points"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_settings"
         tools:ignore="TouchTargetSizeCheck" />
 
     <androidx.recyclerview.widget.RecyclerView
