@@ -1,23 +1,33 @@
 package com.example.explqrer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-/**
- * Link: https://www.androidauthority.com/how-to-build-an-image-gallery-app-718976/
- * Author: Adam Sinicki
- * populates the Gallery images list
- */
-public class GalleryList extends AppCompatActivity {
+public class GalleryBuilder {
+    /**
+     * This populates the gallery with a GalleryAdapter
+     *  Link: https://www.androidauthority.com/how-to-build-an-image-gallery-app-718976/
+     *  Author: Adam Sinicki
+     */
+    public static void populateGallery(PlayerProfile player, RecyclerView galleryRecyclerView, Context context){
+
+        //set up the RecyclerView for the gallery
+        galleryRecyclerView.setHasFixedSize(true);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context,4);
+        galleryRecyclerView.setLayoutManager(gridLayoutManager);
+
+        ArrayList<GalleryListItem> listOfImages = updateGallery(player);
+
+        GalleryAdapter galleryListAdapter = new GalleryAdapter(context,listOfImages);
+        System.out.println("before adapter");
+        galleryRecyclerView.setAdapter(galleryListAdapter);
+    }
 
     public static ArrayList<GalleryListItem> updateGallery(PlayerProfile player){
 
