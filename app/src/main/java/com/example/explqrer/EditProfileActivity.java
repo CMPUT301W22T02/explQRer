@@ -83,7 +83,7 @@ public class EditProfileActivity extends AppCompatActivity {
             String newUserName = userName.getText().toString();
             String newContactEmail = userContact.getText().toString();
 
-            DataHandler dataHandler = DataHandler.getInstance();
+            DataHandler dataHandler = new DataHandler();
             //get player with the newUserName inputed from the data base
             dataHandler.getPlayer(newUserName, new OnGetPlayerListener() {
 

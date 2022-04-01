@@ -82,7 +82,7 @@ public class ScanningPageActivity extends AppCompatActivity
 
         // get the player from main activity
         playerProfile = MainActivity.getPlayer();
-        dataHandler = DataHandler.getInstance();
+        dataHandler = new DataHandler();
         // get ImageView and Textview for later use
         alreadyScanned = findViewById(R.id.already_scanned_text);
         goBack = findViewById(R.id.go_back);

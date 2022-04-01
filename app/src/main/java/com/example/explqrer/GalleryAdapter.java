@@ -2,18 +2,25 @@ package com.example.explqrer;
 
 
 import static com.example.explqrer.R.id.image;
+import static com.example.explqrer.R.id.image_gallery;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -32,6 +39,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     private ArrayList<GalleryListItem> galleryList;
     private Context context;
+    private UserProfileActivity activity;
 
     /**
      * Constructor for the class
@@ -40,10 +48,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
      * @param galleryList
      *  galleryList is the array list for the adapter
      */
-    public GalleryAdapter(Context context, ArrayList<GalleryListItem> galleryList) {
+    public GalleryAdapter(Context context, ArrayList<GalleryListItem> galleryList,UserProfileActivity activity) {
         this.galleryList = galleryList;
         this.context = context;
-        System.out.println("in adapter");
+        this.activity = activity;
     }
 
     /**
@@ -92,9 +100,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         private ImageView image;
         public ViewHolder(View view) {
             super(view);
-
             image = view.findViewById(R.id.image);
+            view.setOnClickListener(view1 -> {
+                    String codeHash = galleryList.get(getBindingAdapterPosition()).getHashCode();
+                    Bitmap codeImage = galleryList.get(getBindingAdapterPosition()).getImage();
+                    String codeDescription = galleryList.get(getBindingAdapterPosition()).getCodeDescription();
+                    int codePts = galleryList.get(getBindingAdapterPosition()).getCodePts();
+                    activity.generateFragment(codeHash,codeImage,codePts,codeDescription);
+            });
         }
     }
-
 }

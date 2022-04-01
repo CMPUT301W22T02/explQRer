@@ -38,7 +38,7 @@ public class ScannedRank extends AppCompatActivity implements NavigationBarView.
 
 
         Context context = this;
-        DataHandler dh = DataHandler.getInstance();
+        DataHandler dh = new DataHandler();
         dh.getQrLeaderBoard(new OnGetQrLeaderBoardListener() {
             @Override
             public void getQrLeaderBoardListener(ArrayList<String> leaderboard) {

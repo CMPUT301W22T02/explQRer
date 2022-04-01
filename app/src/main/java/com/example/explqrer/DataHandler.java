@@ -46,18 +46,10 @@ public class DataHandler {
     // Firestore Objects
     final private FirebaseFirestore db;
     final private FirebaseStorage storage;
-    private static DataHandler instance;
 
-    private DataHandler(){
+    public DataHandler(){
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-    }
-
-    public static DataHandler getInstance() {
-        if (instance == null) {
-            instance = new DataHandler();
-        }
-        return instance;
     }
 
 
@@ -86,12 +78,9 @@ public class DataHandler {
                 if(documentSnapshot.exists()){
                     docRef.update("users", FieldValue.arrayUnion(username));
                     if(documentSnapshot.getData().get("location") == null){
-                        ArrayList<Double> location = null;
-                        if (code.getLocation() != null){
-                            location = new ArrayList<>();
-                            location.add(code.getLocation().getLatitude());
-                            location.add(code.getLocation().getLongitude());
-                        }
+                        ArrayList<Double> location = new ArrayList();
+                        location.add(code.getLocation().getLatitude());
+                        location.add(code.getLocation().getLongitude());
                         docRef.update("location",location);
                     }
                 }
@@ -197,16 +186,19 @@ public class DataHandler {
         // Get the documents
         Map<String,Object> qrs = new HashMap<>();
 
-        cr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                for(QueryDocumentSnapshot doc: task.getResult()){
-                    String qr = doc.getId();
-                    ArrayList<String> usernames = (ArrayList<String>) doc.getData().get("users");
-                    qrs.put(qr,usernames);
+        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot doc: task.getResult()){
+                        String qr = doc.getId();
+                        ArrayList<String> usernames = (ArrayList<String>) doc.getData().get("users");
+                        qrs.put(qr,usernames);
+                    }
+                    listener.onQrFilled(qrs);
+                } else {
+                    listener.onError(task.getException());
                 }
-                listener.onQrFilled(qrs);
-            } else {
-                listener.onError(task.getException());
             }
         });
     }
@@ -366,22 +358,26 @@ public class DataHandler {
         //Get the data of the specific player
 
         DocumentReference dr = cr.document(username);
-        dr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Gson gson = new Gson();
-                PlayerProfile playerProfile;
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    String json = (String) doc.getData().get("json");
-                    playerProfile = gson.fromJson(json, PlayerProfile.class);
+        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    Gson gson = new Gson();
+                    PlayerProfile playerProfile;
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+//                        data = doc.getData().get("json");
+                        String json = (String) doc.getData().get("json");
+                        playerProfile = gson.fromJson(json, PlayerProfile.class);
+                    }
+                    else{
+                        playerProfile = null;
+                    }
+                    listener.getPlayerListener(playerProfile);
                 }
                 else{
-                    playerProfile = null;
+                    listener.getPlayerListener(null);
                 }
-                listener.getPlayerListener(playerProfile);
-            }
-            else{
-                listener.getPlayerListener(null);
             }
         });
     }
@@ -390,15 +386,18 @@ public class DataHandler {
         // Collection ref
         CollectionReference cr = db.collection("player");
 
-        cr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                ArrayList<String> players = new ArrayList<>();
-                for(QueryDocumentSnapshot doc: task.getResult()){
-                    if(doc.getId().contains(searchText)){
-                        players.add(doc.getId());
+        cr.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    ArrayList<String> players = new ArrayList<>();
+                    for(QueryDocumentSnapshot doc: task.getResult()){
+                        if(doc.getId().contains(searchText)){
+                            players.add(doc.getId());
+                        }
                     }
+                    listener.searchPlayersListener(players);
                 }
-                listener.searchPlayersListener(players);
             }
         });
 
@@ -479,13 +478,16 @@ public class DataHandler {
         CollectionReference cr = db.collection("player");
 
         // Update the ptsL for each player
-        cr.orderBy("pts", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                int pos = 1;
-                for(QueryDocumentSnapshot doc : task.getResult()){
-                    String username = doc.getId();
-                    DocumentReference dr = cr.document(username);
-                    dr.update("ptsL",pos++);
+        cr.orderBy("pts", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    int pos = 1;
+                    for(QueryDocumentSnapshot doc : task.getResult()){
+                        String username = doc.getId();
+                        DocumentReference dr = cr.document(username);
+                        dr.update("ptsL",pos++);
+                    }
                 }
             }
         });
@@ -508,18 +510,21 @@ public class DataHandler {
         // Get the ptsL and store it
 
 
-        dr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                long ptsL = 0;
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    ptsL = (long) doc.getData().get("ptsL");
+        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    long ptsL = 0;
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        ptsL = (long) doc.getData().get("ptsL");
+                    }
+                    listener.getPtsLListener(ptsL);
                 }
-                listener.getPtsLListener(ptsL);
-            }
-            else {
-                // if the task is unsuccessful
-                listener.getPtsLListener(-1);
+                else {
+                    // if the task is unsuccessful
+                    listener.getPtsLListener(-1);
+                }
             }
         });
     }
@@ -534,16 +539,19 @@ public class DataHandler {
         // Collection reference
         CollectionReference cr = db.collection("player");
 
-        cr.orderBy("ptsL", Query.Direction.ASCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                ArrayList<String> leaderboard = new ArrayList<>();
-                for(QueryDocumentSnapshot doc: task.getResult()){
-                    leaderboard.add(doc.getId());
+        cr.orderBy("ptsL", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    ArrayList<String> leaderboard = new ArrayList<>();
+                    for(QueryDocumentSnapshot doc: task.getResult()){
+                        leaderboard.add(doc.getId());
+                    }
+                    listener.getPtsLeaderBoardListener(leaderboard);
                 }
-                listener.getPtsLeaderBoardListener(leaderboard);
-            }
-            else {
-                listener.getPtsLeaderBoardListener(null);
+                else {
+                    listener.getPtsLeaderBoardListener(null);
+                }
             }
         });
     }
@@ -560,13 +568,16 @@ public class DataHandler {
         CollectionReference cr = db.collection("player");
 
         // Update the ptsL for each player
-        cr.orderBy("scanned", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                int pos = 1;
-                for(QueryDocumentSnapshot doc : task.getResult()){
-                    String username = doc.getId();
-                    DocumentReference dr = cr.document(username);
-                    dr.update("qrL",pos++);
+        cr.orderBy("scanned", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    int pos = 1;
+                    for(QueryDocumentSnapshot doc : task.getResult()){
+                        String username = doc.getId();
+                        DocumentReference dr = cr.document(username);
+                        dr.update("qrL",pos++);
+                    }
                 }
             }
         });
@@ -589,18 +600,21 @@ public class DataHandler {
         // Get the ptsL and store it
 
 
-        dr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                long qrL = 0;
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    qrL = (long) doc.getData().get("qrL");
+        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    long qrL = 0;
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        qrL = (long) doc.getData().get("qrL");
+                    }
+                    listener.getQrLListener(qrL);
                 }
-                listener.getQrLListener(qrL);
-            }
-            else {
-                // if there is error
-                listener.getQrLListener(-1);
+                else {
+                    // if there is error
+                    listener.getQrLListener(-1);
+                }
             }
         });
     }
@@ -615,17 +629,20 @@ public class DataHandler {
         // Collection reference
         CollectionReference cr = db.collection("player");
 
-        cr.orderBy("qrL", Query.Direction.ASCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                ArrayList<String> leaderboard = new ArrayList<>();
-                for(QueryDocumentSnapshot doc: task.getResult()){
-                    leaderboard.add(doc.getId());
+        cr.orderBy("qrL", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    ArrayList<String> leaderboard = new ArrayList<>();
+                    for(QueryDocumentSnapshot doc: task.getResult()){
+                        leaderboard.add(doc.getId());
+                    }
+                    listener.getQrLeaderBoardListener(leaderboard);
                 }
-                listener.getQrLeaderBoardListener(leaderboard);
-            }
-            else{
-                // if error
-                listener.getQrLeaderBoardListener(null);
+                else{
+                    // if error
+                    listener.getQrLeaderBoardListener(null);
+                }
             }
         });
     }
@@ -643,13 +660,16 @@ public class DataHandler {
         CollectionReference cr = db.collection("player");
 
         // Update the ptsL for each player
-        cr.orderBy("uniqueScanned", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                int pos = 1;
-                for(QueryDocumentSnapshot doc : task.getResult()){
-                    String username = doc.getId();
-                    DocumentReference dr = cr.document(username);
-                    dr.update("uniqueL",pos++);
+        cr.orderBy("uniqueScanned", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    int pos = 1;
+                    for(QueryDocumentSnapshot doc : task.getResult()){
+                        String username = doc.getId();
+                        DocumentReference dr = cr.document(username);
+                        dr.update("uniqueL",pos++);
+                    }
                 }
             }
         });
@@ -670,18 +690,21 @@ public class DataHandler {
         DocumentReference dr = cr.document(username);
 
         // Get the ptsL and store it
-        dr.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                long qrL = 0;
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    qrL = (long) doc.getData().get("uniqueL");
+        dr.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    long qrL = 0;
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        qrL = (long) doc.getData().get("uniqueL");
+                    }
+                    listener.getUniqueLListener(qrL);
                 }
-                listener.getUniqueLListener(qrL);
-            }
-            else{
-                //If there is error
-                listener.getUniqueLListener(-1);
+                else{
+                    //If there is error
+                    listener.getUniqueLListener(-1);
+                }
             }
         });
     }
@@ -696,17 +719,20 @@ public class DataHandler {
         // Collection reference
         CollectionReference cr = db.collection("player");
 
-        cr.orderBy("uniqueL", Query.Direction.ASCENDING).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                ArrayList<String> leaderboard = new ArrayList<>();
-                for(QueryDocumentSnapshot doc: task.getResult()){
-                    leaderboard.add(doc.getId());
+        cr.orderBy("uniqueL", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    ArrayList<String> leaderboard = new ArrayList<>();
+                    for(QueryDocumentSnapshot doc: task.getResult()){
+                        leaderboard.add(doc.getId());
+                    }
+                    listener.getUniqueLeaderBoardListener(leaderboard);
                 }
-                listener.getUniqueLeaderBoardListener(leaderboard);
-            }
-            else{
-                // Error
-                listener.getUniqueLeaderBoardListener(null);
+                else{
+                    // Error
+                    listener.getUniqueLeaderBoardListener(null);
+                }
             }
         });
     }
@@ -730,46 +756,25 @@ public class DataHandler {
 
         // Set the flag to false by default
 
-        docRef.get().addOnCompleteListener(task -> {
-            boolean flag = false;
-            if(task.isSuccessful()){
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    ArrayList<String> usernames = (ArrayList<String>) doc.getData().get("users");
-                    for(String user: usernames){
-                        if (user.equals(username)) {
-                            flag = true;
-                            break;
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                boolean flag = false;
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        ArrayList<String> usernames = (ArrayList<String>) doc.getData().get("users");
+                        for(String user: usernames){
+                            if (user.equals(username)) {
+                                flag = true;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            listener.hasScannedBeforeListener(flag);
-        });
-    }
-
-    public void scannedBy(String hash, OnScannedByListener listener) {
-        CollectionReference cr = db.collection("qrbase");
-
-        // Get the document
-        DocumentReference docRef = cr.document(hash);
-
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot doc = task.getResult();
-                if (doc.exists()) {
-                    ArrayList<String> usernames = (ArrayList<String>) doc.getData().get("users");
-                    if (usernames == null) {
-                        listener.scannedByListener(0);
-                    } else {
-                        listener.scannedByListener(usernames.size());
-                    }
-                } else {
-                    listener.scannedByListener(-1);
-                }
+                listener.hasScannedBeforeListener(flag);
             }
         });
-
     }
 
     /**
@@ -789,11 +794,14 @@ public class DataHandler {
 
         // Set the flag to false by default
         final boolean[] flag = {true};
-        docRef.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                DocumentSnapshot doc = task.getResult();
-                if(doc.exists()){
-                    flag[0] = false;
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        flag[0] = false;
+                    }
                 }
             }
         });
@@ -846,11 +854,14 @@ public class DataHandler {
         final long[] pts = {0};
 
         // Get the document
-        doc.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                DocumentSnapshot doc1 = task.getResult();
-                if(doc1.exists()){
-                    pts[0] =(long) doc1.getData().get("pts");
+        doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    if(doc.exists()){
+                        pts[0] =(long) doc.getData().get("pts");
+                    }
                 }
             }
         });

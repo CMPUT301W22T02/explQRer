@@ -19,6 +19,13 @@ import java.util.Set;
  */
 public class GalleryList extends AppCompatActivity {
 
+    /**
+     * update the gallery list
+     * @param player
+     *     takes in a player object
+     * @return listOfImages
+     *     list of bitmaps that corrospond to th QR codes scanned
+     */
     public static ArrayList<GalleryListItem> updateGallery(PlayerProfile player){
 
         HashMap<GameCode,GameCode> qrCodes = player.getCodes();
@@ -30,8 +37,13 @@ public class GalleryList extends AppCompatActivity {
         //loop through the QRs scanned by the player
         for(GameCode qr : qrCodesSet ){
             GalleryListItem galleryListItem = new GalleryListItem();
+
+            //get the hash of the qr and set it to the galleryListItem
+            galleryListItem.setHashCode(qr.getSha256hex());
             //get image of the qr scanned and set the images
-            galleryListItem.setImageId(qr.getPhoto());
+            galleryListItem.setImage(qr.getPhoto());
+            galleryListItem.setCodePts(qr.getScore());
+            galleryListItem.setCodeDescription(qr.getDescription());
             listOfImages.add(galleryListItem);
         }
         System.out.println("before listof images");
